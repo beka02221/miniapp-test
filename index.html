@@ -6,53 +6,68 @@
     <title>Rock Paper Scissors</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
             text-align: center;
             margin: 0;
             padding: 0;
         }
         h1 {
-            color: #333;
+            color: #4CAF50;
+            margin-top: 20px;
         }
         #game-container {
             margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto;
         }
         #loading, #game, #result, #score {
             display: none;
         }
         .btn {
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 15px 30px;
+            margin: 20px;
             font-size: 18px;
             cursor: pointer;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
         }
         .btn:hover {
             background-color: #45a049;
         }
         .choice-btn {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px;
+            font-size: 40px;
             cursor: pointer;
             background-color: #008CBA;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
         }
         .choice-btn:hover {
             background-color: #007bb5;
         }
-        #score-board {
+        #score-board, #stars, #rounds {
             margin-top: 20px;
         }
-        #stars {
-            margin-top: 20px;
-            font-size: 24px;
-            color: gold;
+        .choices {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #yourChoice, #botChoice {
+            font-size: 50px;
+            margin: 10px;
         }
         footer {
             margin-top: 50px;
@@ -74,12 +89,24 @@
 
         <div id="game">
             <p>Opponent found! Choose your move:</p>
-            <button class="choice-btn" onclick="playRound('rock')">Rock</button>
-            <button class="choice-btn" onclick="playRound('paper')">Paper</button>
-            <button class="choice-btn" onclick="playRound('scissors')">Scissors</button>
+            <div class="choices">
+                <button class="choice-btn" onclick="playRound('rock')">✊</button>
+                <button class="choice-btn" onclick="playRound('paper')">🖐️</button>
+                <button class="choice-btn" onclick="playRound('scissors')">✌️</button>
+            </div>
         </div>
 
         <div id="result">
+            <div class="choices">
+                <div>
+                    <p>You chose:</p>
+                    <div id="yourChoice">❓</div>
+                </div>
+                <div>
+                    <p>Bot chose:</p>
+                    <div id="botChoice">❓</div>
+                </div>
+            </div>
             <p id="resultMessage"></p>
             <button class="btn" onclick="nextRound()">Next Round</button>
         </div>
@@ -97,6 +124,11 @@
 
     <script>
         const choices = ['rock', 'paper', 'scissors'];
+        const emojis = {
+            'rock': '✊',
+            'paper': '🖐️',
+            'scissors': '✌️'
+        };
         let round = 1;
         let playerWins = 0;
         let botWins = 0;
@@ -117,18 +149,23 @@
             const botChoice = choices[Math.floor(Math.random() * 3)];
             let resultMessage = '';
 
+            // Показ выбранных вариантов игрока и бота
+            document.getElementById('yourChoice').innerText = emojis[playerChoice];
+            document.getElementById('botChoice').innerText = emojis[botChoice];
+
+            // Логика победы/проигрыша
             if (playerChoice === botChoice) {
-                resultMessage = `It's a tie! You both chose ${playerChoice}`;
+                resultMessage = `It's a tie! You both chose ${emojis[playerChoice]}`;
             } else if (
                 (playerChoice === 'rock' && botChoice === 'scissors') ||
                 (playerChoice === 'scissors' && botChoice === 'paper') ||
                 (playerChoice === 'paper' && botChoice === 'rock')
             ) {
                 playerWins++;
-                resultMessage = `You win! ${playerChoice} beats ${botChoice}`;
+                resultMessage = `You win! ${emojis[playerChoice]} beats ${emojis[botChoice]}`;
             } else {
                 botWins++;
-                resultMessage = `You lose! ${botChoice} beats ${playerChoice}`;
+                resultMessage = `You lose! ${emojis[botChoice]} beats ${emojis[playerChoice]}`;
             }
 
             document.getElementById('game').style.display = 'none';
