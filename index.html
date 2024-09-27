@@ -16,7 +16,7 @@
             color: #b48c24; /* Цвет заголовка */
         }
         .choices {
-            display: flex;
+            display: none; /* Скрыть карточки изначально */
             justify-content: center;
             margin: 20px 0;
         }
@@ -39,19 +39,15 @@
             color: gold;
             font-size: 1.5em;
         }
-        .menu {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-        }
-        .menu-item {
-            cursor: pointer;
+        .start {
+            margin: 20px;
             padding: 10px 20px;
             border: 1px solid #b48c24;
             border-radius: 5px;
+            cursor: pointer;
             transition: background-color 0.3s;
         }
-        .menu-item:hover {
+        .start:hover {
             background-color: #e8d06d; /* Цвет при наведении */
         }
     </style>
@@ -59,26 +55,28 @@
 <body>
 
     <h1>Камень, Ножницы, Бумага</h1>
-    <div class="choices">
+    <button class="start" onclick="startGame()">Начать игру</button>
+
+    <div class="choices" id="choices">
         <div class="choice" onclick="userChoice('rock')">🪨 Камень</div>
         <div class="choice" onclick="userChoice('scissors')">✂️ Ножницы</div>
         <div class="choice" onclick="userChoice('paper')">📄 Бумага</div>
     </div>
-    
-    <button onclick="startGame()">Поиск соперника</button>
-    
+
     <div class="result" id="result"></div>
     <div class="stars" id="stars"></div>
-
-    <div class="menu">
-        <div class="menu-item">Главное меню</div>
-        <div class="menu-item">Настройки</div>
-        <div class="menu-item">Помощь</div>
-    </div>
 
     <script>
         let userWins = 0;
         let rounds = 0;
+
+        function startGame() {
+            userWins = 0;
+            rounds = 0;
+            document.getElementById('result').innerText = '';
+            document.getElementById('stars').innerText = '';
+            document.getElementById('choices').style.display = 'flex'; // Показываем карточки
+        }
 
         function userChoice(choice) {
             if (rounds < 3) {
@@ -126,15 +124,7 @@
             }
             document.getElementById('result').innerText += `\n${finalText}`;
         }
-
-        function startGame() {
-            userWins = 0;
-            rounds = 0;
-            document.getElementById('result').innerText = '';
-            document.getElementById('stars').innerText = '';
-        }
     </script>
 
 </body>
 </html>
-
