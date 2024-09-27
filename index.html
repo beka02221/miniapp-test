@@ -40,10 +40,9 @@
 <script>
     let scene, camera, renderer, controls;
     let playerName = '';
-    let playerCard = null;
+    let cardMeshes = [];
     const cardValues = ['✊', '🖐️', '✌️'];
     const cardNames = ['rock', 'paper', 'scissors'];
-    const cardMeshes = [];
 
     function init() {
         // Сцена
@@ -94,10 +93,6 @@
             cardMesh.callback = function() {
                 throwCard(cardNames[index]);
             };
-
-            cardMesh.onClick = function() {
-                throwCard(cardNames[index]);
-            };
         });
     }
 
@@ -129,7 +124,7 @@
     }
 
     document.getElementById('startGame').addEventListener('click', () => {
-        playerName = document.getElementById('playerName').value;
+        playerName = document.getElementById('playerName').value.trim(); // Удаление лишних пробелов
         if (playerName) {
             document.getElementById('ui').style.display = 'none';
             cardMeshes.forEach(card => {
