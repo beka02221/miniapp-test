@@ -3,49 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors</title>
+    <title>Rock Paper Scissors Game</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff;
-            color: #333;
+            font-family: 'Press Start 2P', cursive; /* Шрифт в стиле старых игр */
+            background-color: #000; /* Черный фон */
+            color: #fff; /* Белый текст */
             text-align: center;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
         h1 {
-            color: #4CAF50;
-            margin-top: 20px;
+            margin: 20px;
+            font-size: 2.5em;
+            color: #FFD700; /* Золотой цвет */
         }
         #game-container {
-            margin-top: 50px;
+            margin: 20px;
             padding: 20px;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.1); /* Полупрозрачный фон */
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px); /* Размытие фона */
+            max-width: 100%; /* Максимальная ширина 100% */
+            overflow: hidden;
         }
-        #loading, #game, #result, #score {
+        #loading, #game, #result, #score, #nameInput {
             display: none;
         }
-        .btn {
+        .btn, .name-btn {
             padding: 15px 30px;
             margin: 20px;
-            font-size: 18px;
+            font-size: 1.5em;
             cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
+            background-color: #FFD700; /* Золотой цвет */
+            color: #000; /* Черный текст */
             border: none;
             border-radius: 10px;
             transition: background-color 0.3s ease;
+            width: calc(100% - 60px); /* Ширина кнопок */
         }
-        .btn:hover {
-            background-color: #45a049;
+        .btn:hover, .name-btn:hover {
+            background-color: #FFC107; /* Светлее при наведении */
         }
         .choice-btn {
             padding: 15px;
-            font-size: 40px;
+            font-size: 4em; /* Увеличенный шрифт для кнопок выбора */
             cursor: pointer;
             background-color: #008CBA;
             color: white;
@@ -53,6 +60,7 @@
             border-radius: 10px;
             margin: 10px;
             transition: background-color 0.3s ease;
+            width: 80px; /* Фиксированная ширина кнопок выбора */
         }
         .choice-btn:hover {
             background-color: #007bb5;
@@ -64,9 +72,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column; /* Выравнивание по вертикали */
         }
         #yourChoice, #botChoice {
-            font-size: 50px;
+            font-size: 5em; /* Увеличенный шрифт для выбора */
             margin: 10px;
         }
         footer {
@@ -108,12 +117,18 @@
             100% { opacity: 1; transform: scale(1); }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <h1>Rock Paper Scissors Game</h1>
 
     <div id="game-container">
+        <div id="nameInput">
+            <input type="text" id="playerName" placeholder="Enter your name" style="padding: 10px; font-size: 1.5em; border-radius: 5px; border: none; width: calc(100% - 20px);">
+            <button id="submitName" class="name-btn">Start Game</button>
+        </div>
+
         <button id="startBtn" class="btn">Find Opponent</button>
         
         <div id="loading">
@@ -166,6 +181,17 @@
         let round = 1;
         let playerWins = 0;
         let botWins = 0;
+        let playerName = '';
+
+        document.getElementById('submitName').addEventListener('click', function() {
+            playerName = document.getElementById('playerName').value;
+            if (playerName) {
+                document.getElementById('nameInput').style.display = 'none';
+                document.getElementById('startBtn').style.display = 'block';
+            } else {
+                alert('Please enter your name!');
+            }
+        });
 
         document.getElementById('startBtn').addEventListener('click', startGame);
 
@@ -197,59 +223,57 @@
             ) {
                 playerWins++;
                 document.getElementById('yourChoice').classList.add('win-animation');
-                resultMessage = `You win! ${emojis[playerChoice]} beats ${emojis[botChoice]}`;
+                resultMessage = `${playerName}, you win! ${emojis[playerChoice]} beats ${emojis[botChoice]}`;
             } else {
                 botWins++;
-                document.getElementById('botChoice').classList.add('win-animation');
+                document.getElementById('botChoice').classList.add('lose-animation');
                 resultMessage = `You lose! ${emojis[botChoice]} beats ${emojis[playerChoice]}`;
             }
 
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
             document.getElementById('resultMessage').innerText = resultMessage;
+            document.getElementById('playerWins').innerText = playerWins;
+            document.getElementById('botWins').innerText = botWins;
+            document.getElementById('round').innerText = round;
+
+            if (round === 3) {
+                endGame();
+            } else {
+                document.getElementById('result').style.display = 'block';
+            }
+
+            round++;
         }
 
         function nextRound() {
-            round++;
-            if (round > 3) {
-                endGame();
-            } else {
-                document.getElementById('round').innerText = round;
-                document.getElementById('result').style.display = 'none';
-                document.getElementById('game').style.display = 'block';
-
-                // Убираем анимации после завершения раунда
-                document.getElementById('yourChoice').classList.remove('win-animation');
-                document.getElementById('botChoice').classList.remove('win-animation');
-            }
+            document.getElementById('yourChoice').innerText = '❓';
+            document.getElementById('botChoice').innerText = '❓';
+            document.getElementById('result').style.display = 'none';
         }
 
         function endGame() {
+            document.getElementById('game').style.display = 'none';
             document.getElementById('result').style.display = 'none';
-            let stars = '';
+            document.getElementById('score-board').style.display = 'none';
 
-            if (playerWins > botWins) {
-                stars = '⭐️⭐️⭐️⭐️⭐️ You win 5 stars!';
-                showStars(5);
-            } else {
-                stars = 'You lose! No stars this time.';
-            }
-
-            document.getElementById('stars').innerText = stars;
-        }
-
-        function showStars(starCount) {
-            const starsContainer = document.getElementById('stars');
-            starsContainer.innerHTML = '';
-            for (let i = 0; i < starCount; i++) {
+            const stars = document.getElementById('stars');
+            for (let i = 0; i < playerWins; i++) {
                 const star = document.createElement('span');
-                star.innerHTML = '⭐️';
+                star.innerText = '⭐';
                 star.classList.add('star-animation');
-                star.style.animationDelay = `${i * 0.3}s`;  // Задержка между анимациями
-                starsContainer.appendChild(star);
+                stars.appendChild(star);
+
+                // Анимация для звезды
+                setTimeout(() => {
+                    star.style.opacity = 1;
+                    star.style.transform = 'scale(1)';
+                }, i * 300); // Задержка между звездами
             }
+
+            setTimeout(() => {
+                alert(`Game over! ${playerName}, you won ${playerWins} out of 3 rounds!`);
+                location.reload(); // Перезагрузить страницу для новой игры
+            }, 2000);
         }
     </script>
-
 </body>
 </html>
