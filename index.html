@@ -73,6 +73,40 @@
             margin-top: 50px;
             color: #888;
         }
+
+        /* Анимации */
+        .win-animation {
+            animation: winScale 0.5s ease-in-out forwards;
+        }
+
+        .lose-animation {
+            animation: loseShake 0.5s ease-in-out forwards;
+        }
+
+        .star-animation {
+            opacity: 0;
+            animation: starAppear 1.5s ease-in-out forwards;
+        }
+
+        @keyframes winScale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes loseShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes starAppear {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -162,9 +196,11 @@
                 (playerChoice === 'paper' && botChoice === 'rock')
             ) {
                 playerWins++;
+                document.getElementById('yourChoice').classList.add('win-animation');
                 resultMessage = `You win! ${emojis[playerChoice]} beats ${emojis[botChoice]}`;
             } else {
                 botWins++;
+                document.getElementById('botChoice').classList.add('win-animation');
                 resultMessage = `You lose! ${emojis[botChoice]} beats ${emojis[playerChoice]}`;
             }
 
@@ -181,6 +217,10 @@
                 document.getElementById('round').innerText = round;
                 document.getElementById('result').style.display = 'none';
                 document.getElementById('game').style.display = 'block';
+
+                // Убираем анимации после завершения раунда
+                document.getElementById('yourChoice').classList.remove('win-animation');
+                document.getElementById('botChoice').classList.remove('win-animation');
             }
         }
 
@@ -190,11 +230,24 @@
 
             if (playerWins > botWins) {
                 stars = '⭐️⭐️⭐️⭐️⭐️ You win 5 stars!';
+                showStars(5);
             } else {
                 stars = 'You lose! No stars this time.';
             }
 
             document.getElementById('stars').innerText = stars;
+        }
+
+        function showStars(starCount) {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('span');
+                star.innerHTML = '⭐️';
+                star.classList.add('star-animation');
+                star.style.animationDelay = `${i * 0.3}s`;  // Задержка между анимациями
+                starsContainer.appendChild(star);
+            }
         }
     </script>
 
