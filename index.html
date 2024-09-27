@@ -12,6 +12,7 @@
             text-align: center;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
         h1 {
             color: #ffcc00;
@@ -23,7 +24,7 @@
             width: 90%;
             max-width: 600px;
         }
-        #loading, #game, #result, #score {
+        #loading, #game, #result, #profile {
             display: none;
         }
         .btn {
@@ -56,6 +57,17 @@
         }
         #score-board {
             margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+        }
+        #playerNameDisplay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #ffcc00;
         }
         #stars {
             margin-top: 20px;
@@ -83,6 +95,17 @@
             background-image: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwyMDg2M3wwfDF8c2VhcmNofDd8fGdyYXZpdHxlbnwwfHx8fDE2MjAzMDE5MzY&ixlib=rb-1.2.1&q=80&w=1080');
             z-index: -1;
         }
+        #profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #profile-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: #ffcc00;
+        }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 </head>
@@ -99,6 +122,8 @@
             <p>Loading...</p>
         </div>
 
+        <div id="playerNameDisplay"></div>
+
         <div id="game">
             <p>Opponent found! Choose your move:</p>
             <div>
@@ -114,14 +139,24 @@
         </div>
 
         <div id="score-board">
-            <p>Round: <span id="round">1</span>/3</p>
-            <p>Player Wins: <span id="playerWins">0</span></p>
-            <p>Bot Wins: <span id="botWins">0</span></p>
-            <div id="playerChoice"></div>
-            <div id="botChoice"></div>
+            <div>
+                <p>Your Choice: <span id="playerChoice"></span></p>
+                <p>Opponent Choice: <span id="botChoice"></span></p>
+                <p>Result: <span id="gameResult"></span></p>
+            </div>
+            <div>
+                <p>Wins: <span id="playerWins">0</span></p>
+                <p>Defeats: <span id="botWins">0</span></p>
+            </div>
         </div>
 
         <div id="stars"></div>
+        <div id="profile-btn" class="btn" onclick="toggleProfile()">Profile</div>
+        <div id="profile">
+            <p id="profileName"></p>
+            <p id="profileWins"></p>
+            <p id="profileDefeats"></p>
+        </div>
     </div>
 
     <footer>Created by Bekhruz</footer>
@@ -132,11 +167,14 @@
         let playerWins = 0;
         let botWins = 0;
         let playerName = '';
+        let profileVisible = false;
 
         document.getElementById('startBtn').addEventListener('click', startGame);
 
         function startGame() {
             playerName = document.getElementById('playerName').value || "Player";
+            document.getElementById('playerNameDisplay').innerText = playerName;
+            document.getElementById('playerName').style.display = 'none';
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
 
@@ -150,26 +188,26 @@
             const botChoice = choices[Math.floor(Math.random() * 3)];
             let resultMessage = '';
 
-            document.getElementById('playerChoice').innerText = `${playerName} chose: ${getEmoji(playerChoice)}`;
-            document.getElementById('botChoice').innerText = `Bot chose: ${getEmoji(botChoice)}`;
+            document.getElementById('playerChoice').innerText = getEmoji(playerChoice);
+            document.getElementById('botChoice').innerText = getEmoji(botChoice);
 
             if (playerChoice === botChoice) {
-                resultMessage = `It's a tie! Both chose ${getEmoji(playerChoice)}`;
+                resultMessage = "It's a tie!";
             } else if (
                 (playerChoice === 'rock' && botChoice === 'scissors') ||
                 (playerChoice === 'scissors' && botChoice === 'paper') ||
                 (playerChoice === 'paper' && botChoice === 'rock')
             ) {
                 playerWins++;
-                resultMessage = `${playerName} wins! ${getEmoji(playerChoice)} beats ${getEmoji(botChoice)}`;
+                resultMessage = `${playerName} wins!`;
             } else {
                 botWins++;
-                resultMessage = `You lose! ${getEmoji(botChoice)} beats ${getEmoji(playerChoice)}`;
+                resultMessage = `You lose!`;
             }
 
+            document.getElementById('gameResult').innerText = resultMessage;
             document.getElementById('game').style.display = 'none';
             document.getElementById('result').style.display = 'block';
-            document.getElementById('resultMessage').innerText = resultMessage;
         }
 
         function nextRound() {
@@ -177,11 +215,9 @@
             if (round > 3) {
                 endGame();
             } else {
-                document.getElementById('round').innerText = round;
+                document.getElementById('score-board').style.display = 'none';
                 document.getElementById('result').style.display = 'none';
                 document.getElementById('game').style.display = 'block';
-                document.getElementById('playerChoice').innerText = '';
-                document.getElementById('botChoice').innerText = '';
             }
         }
 
@@ -196,6 +232,18 @@
             }
 
             document.getElementById('stars').innerText = stars;
+            updateProfile();
+        }
+
+        function updateProfile() {
+            document.getElementById('profileName').innerText = `Name: ${playerName}`;
+            document.getElementById('profileWins').innerText = `Wins: ${playerWins}`;
+            document.getElementById('profileDefeats').innerText = `Defeats: ${botWins}`;
+        }
+
+        function toggleProfile() {
+            profileVisible = !profileVisible;
+            document.getElementById('profile').style.display = profileVisible ? 'block' : 'none';
         }
 
         function getEmoji(choice) {
@@ -206,6 +254,8 @@
                     return '✋';
                 case 'scissors':
                     return '✌️';
+                default:
+                    return '';
             }
         }
     </script>
