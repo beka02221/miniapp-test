@@ -50,10 +50,11 @@
             border: 2px solid #ffcc00;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: transform 0.3s, background-color 0.3s;
         }
         .choice-card:hover {
             transform: scale(1.1);
+            background-color: #555;
         }
         #score-board {
             margin-top: 20px;
@@ -95,6 +96,7 @@
             height: 100%;
             background-image: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwyMDg2M3wwfDF8c2VhcmNofDd8fGdyYXZpdHxlbnwwfHx8fDE2MjAzMDE5MzY&ixlib=rb-1.2.1&q=80&w=1080');
             z-index: -1;
+            filter: blur(4px);
         }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
@@ -115,9 +117,9 @@
         <div id="game">
             <p>Choose your move:</p>
             <div>
-                <div class="choice-card" onclick="playRound('rock')">✊</div>
-                <div class="choice-card" onclick="playRound('paper')">✋</div>
-                <div class="choice-card" onclick="playRound('scissors')">✌️</div>
+                <div class="choice-card" onclick="playRound('rock')">🪨</div>
+                <div class="choice-card" onclick="playRound('paper')">📄</div>
+                <div class="choice-card" onclick="playRound('scissors')">✂️</div>
             </div>
         </div>
 
@@ -211,11 +213,11 @@
         function getEmoji(choice) {
             switch (choice) {
                 case 'rock':
-                    return '✊';
+                    return '🪨';
                 case 'paper':
-                    return '✋';
+                    return '📄';
                 case 'scissors':
-                    return '✌️';
+                    return '✂️';
             }
         }
 
@@ -240,4 +242,3 @@
 
 </body>
 </html>
-
