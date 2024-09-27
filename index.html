@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        #game-container {
+            margin-top: 50px;
+        }
+        #loading, #game, #result, #score {
+            display: none;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .choice-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .choice-btn:hover {
+            background-color: #007bb5;
+        }
+        #score-board {
+            margin-top: 20px;
+        }
+        #stars {
+            margin-top: 20px;
+            font-size: 24px;
+            color: gold;
+        }
+        footer {
+            margin-top: 50px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Rock Paper Scissors Game</h1>
+
+    <div id="game-container">
+        <button id="startBtn" class="btn">Find Opponent</button>
+        
+        <div id="loading">
+            <p>Finding opponent...</p>
+            <p>Loading...</p>
+        </div>
+
+        <div id="game">
+            <p>Opponent found! Choose your move:</p>
+            <button class="choice-btn" onclick="playRound('rock')">Rock</button>
+            <button class="choice-btn" onclick="playRound('paper')">Paper</button>
+            <button class="choice-btn" onclick="playRound('scissors')">Scissors</button>
+        </div>
+
+        <div id="result">
+            <p id="resultMessage"></p>
+            <button class="btn" onclick="nextRound()">Next Round</button>
+        </div>
+
+        <div id="score-board">
+            <p>Round: <span id="round">1</span>/3</p>
+            <p>Player Wins: <span id="playerWins">0</span></p>
+            <p>Bot Wins: <span id="botWins">0</span></p>
+        </div>
+
+        <div id="stars"></div>
+    </div>
+
+    <footer>Created by Bekhruz</footer>
+
+    <script>
+        const choices = ['rock', 'paper', 'scissors'];
+        let round = 1;
+        let playerWins = 0;
+        let botWins = 0;
+
+        document.getElementById('startBtn').addEventListener('click', startGame);
+
+        function startGame() {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('game').style.display = 'block';
+            }, 2000);
+        }
+
+        function playRound(playerChoice) {
+            const botChoice = choices[Math.floor(Math.random() * 3)];
+            let resultMessage = '';
+
+            if (playerChoice === botChoice) {
+                resultMessage = `It's a tie! You both chose ${playerChoice}`;
+            } else if (
+                (playerChoice === 'rock' && botChoice === 'scissors') ||
+                (playerChoice === 'scissors' && botChoice === 'paper') ||
+                (playerChoice === 'paper' && botChoice === 'rock')
+            ) {
+                playerWins++;
+                resultMessage = `You win! ${playerChoice} beats ${botChoice}`;
+            } else {
+                botWins++;
+                resultMessage = `You lose! ${botChoice} beats ${playerChoice}`;
+            }
+
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('resultMessage').innerText = resultMessage;
+        }
+
+        function nextRound() {
+            round++;
+            if (round > 3) {
+                endGame();
+            } else {
+                document.getElementById('round').innerText = round;
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('game').style.display = 'block';
+            }
+        }
+
+        function endGame() {
+            document.getElementById('result').style.display = 'none';
+            let stars = '';
+
+            if (playerWins > botWins) {
+                stars = '⭐️⭐️⭐️⭐️⭐️ You win 5 stars!';
+            } else {
+                stars = 'You lose! No stars this time.';
+            }
+
+            document.getElementById('stars').innerText = stars;
+        }
+    </script>
+
+</body>
+</html>
