@@ -8,10 +8,16 @@
         body {
             font-family: 'Comic Sans MS', cursive, sans-serif;
             background-color: #f0f8ff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             text-align: center;
         }
         h1 {
-            margin-top: 20px;
+            margin: 20px 0;
             color: #333;
         }
         .button {
@@ -31,11 +37,13 @@
             display: inline-block;
             margin: 20px;
             padding: 20px;
+            width: 100px;
+            height: 100px;
             border: 2px solid #ccc;
             border-radius: 15px;
             background-color: #fff;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
             transform: scale(1.1);
@@ -49,6 +57,20 @@
         #searching {
             display: none;
         }
+        #screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -57,7 +79,6 @@
     <h1>Камень, Ножницы, Бумага ✂️📄🪨</h1>
     <button class="button" onclick="startGame()">Начать игру</button>
     <button class="button" onclick="showRules()">Правила</button>
-    <button class="button" onclick="showSearch()">Поиск игрока</button>
 </div>
 
 <div id="rules" style="display:none;">
@@ -66,20 +87,14 @@
     <button class="button" onclick="hideRules()">Назад</button>
 </div>
 
-<div id="search" style="display:none;">
-    <h2>Поиск соперника</h2>
-    <input type="text" id="playerName" placeholder="Введите имя игрока">
-    <button class="button" onclick="searchPlayer()">Искать</button>
-    <button class="button" onclick="backToMenu()">Назад</button>
-    <p id="searching">Поиск соперника...</p>
-</div>
-
 <div id="choose" style="display:none;">
     <h2>Выберите свой вариант</h2>
-    <div class="card" onclick="playerChoice('rock')">Камень 🪨</div>
-    <div class="card" onclick="playerChoice('scissors')">Ножницы ✂️</div>
-    <div class="card" onclick="playerChoice('paper')">Бумага 📄</div>
-    <button class="button" onclick="backToSearch()">Назад</button>
+    <div class="container">
+        <div class="card" onclick="playerChoice('rock')">Камень<br>🪨</div>
+        <div class="card" onclick="playerChoice('scissors')">Ножницы<br>✂️</div>
+        <div class="card" onclick="playerChoice('paper')">Бумага<br>📄</div>
+    </div>
+    <button class="button" onclick="backToMenu()">Главное меню</button>
 </div>
 
 <div id="result" style="display:none;">
@@ -91,7 +106,7 @@
 <script>
     function startGame() {
         document.getElementById('menu').style.display = 'none';
-        document.getElementById('search').style.display = 'block';
+        document.getElementById('choose').style.display = 'block';
     }
 
     function showRules() {
@@ -104,30 +119,10 @@
         document.getElementById('menu').style.display = 'block';
     }
 
-    function showSearch() {
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('search').style.display = 'block';
-    }
-
     function backToMenu() {
         document.getElementById('choose').style.display = 'none';
-        document.getElementById('search').style.display = 'none';
         document.getElementById('result').style.display = 'none';
         document.getElementById('menu').style.display = 'block';
-    }
-
-    function searchPlayer() {
-        document.getElementById('searching').style.display = 'block';
-        setTimeout(function() {
-            document.getElementById('searching').style.display = 'none';
-            document.getElementById('search').style.display = 'none';
-            document.getElementById('choose').style.display = 'block';
-        }, 2000);
-    }
-
-    function backToSearch() {
-        document.getElementById('choose').style.display = 'none';
-        document.getElementById('search').style.display = 'block';
     }
 
     function playerChoice(choice) {
@@ -161,4 +156,3 @@
 
 </body>
 </html>
-
