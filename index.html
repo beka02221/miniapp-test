@@ -23,6 +23,7 @@
             margin: 0 auto;
             width: 90%;
             max-width: 600px;
+            position: relative;
         }
         #loading, #game, #result, #profile {
             display: none;
@@ -55,36 +56,40 @@
         .choice-card:hover {
             transform: scale(1.1);
         }
+        #result {
+            margin-top: 20px;
+        }
+        #vs {
+            font-size: 30px;
+            color: #ffcc00;
+            margin: 20px 0;
+        }
         #score-board {
             margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 20px;
-        }
-        #playerNameDisplay {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: #ffcc00;
         }
         #stars {
             margin-top: 20px;
             font-size: 24px;
             color: gold;
         }
-        footer {
-            margin-top: 50px;
-            color: #888;
+        #profile {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background-color: #444;
+            color: white;
+            padding: 20px;
+            transition: left 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
         }
-        input {
-            padding: 10px;
-            margin-top: 20px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            width: 80%;
+        #profile h2 {
+            margin-bottom: 20px;
         }
         #background {
             position: absolute;
@@ -95,17 +100,6 @@
             background-image: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwyMDg2M3wwfDF8c2VhcmNofDd8fGdyYXZpdHxlbnwwfHx8fDE2MjAzMDE5MzY&ixlib=rb-1.2.1&q=80&w=1080');
             z-index: -1;
         }
-        #profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        #profile-btn {
-            cursor: pointer;
-            font-size: 20px;
-            color: #ffcc00;
-        }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 </head>
@@ -114,7 +108,6 @@
     <div id="background"></div>
     <div id="game-container">
         <h1>Rock Paper Scissors Game</h1>
-        <input type="text" id="playerName" placeholder="Enter your name" />
         <button id="startBtn" class="btn">Start Game</button>
         
         <div id="loading">
@@ -122,10 +115,8 @@
             <p>Loading...</p>
         </div>
 
-        <div id="playerNameDisplay"></div>
-
         <div id="game">
-            <p>Opponent found! Choose your move:</p>
+            <p>Choose your move:</p>
             <div>
                 <div class="choice-card" onclick="playRound('rock')">✊</div>
                 <div class="choice-card" onclick="playRound('paper')">✋</div>
@@ -135,27 +126,25 @@
 
         <div id="result">
             <p id="resultMessage"></p>
+            <p id="vs">VS</p>
+            <div id="playerChoice"></div>
+            <div id="botChoice"></div>
             <button class="btn" onclick="nextRound()">Next Round</button>
         </div>
 
         <div id="score-board">
-            <div>
-                <p>Your Choice: <span id="playerChoice"></span></p>
-                <p>Opponent Choice: <span id="botChoice"></span></p>
-                <p>Result: <span id="gameResult"></span></p>
-            </div>
-            <div>
-                <p>Wins: <span id="playerWins">0</span></p>
-                <p>Defeats: <span id="botWins">0</span></p>
-            </div>
+            <p>Player Wins: <span id="playerWins">0</span></p>
+            <p>Bot Wins: <span id="botWins">0</span></p>
         </div>
 
         <div id="stars"></div>
-        <div id="profile-btn" class="btn" onclick="toggleProfile()">Profile</div>
+
         <div id="profile">
-            <p id="profileName"></p>
-            <p id="profileWins"></p>
-            <p id="profileDefeats"></p>
+            <h2>Profile</h2>
+            <p>Total Wins: <span id="totalWins">0</span></p>
+            <p>Total Losses: <span id="totalLosses">0</span></p>
+            <p>Stars: <span id="totalStars">0</span></p>
+            <button class="btn" onclick="swipeBack()">Back</button>
         </div>
     </div>
 
@@ -166,15 +155,13 @@
         let round = 1;
         let playerWins = 0;
         let botWins = 0;
-        let playerName = '';
-        let profileVisible = false;
+        let totalWins = 0;
+        let totalLosses = 0;
+        let totalStars = 0;
 
         document.getElementById('startBtn').addEventListener('click', startGame);
 
         function startGame() {
-            playerName = document.getElementById('playerName').value || "Player";
-            document.getElementById('playerNameDisplay').innerText = playerName;
-            document.getElementById('playerName').style.display = 'none';
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
 
@@ -188,26 +175,30 @@
             const botChoice = choices[Math.floor(Math.random() * 3)];
             let resultMessage = '';
 
-            document.getElementById('playerChoice').innerText = getEmoji(playerChoice);
-            document.getElementById('botChoice').innerText = getEmoji(botChoice);
+            document.getElementById('playerChoice').innerText = `You chose: ${getEmoji(playerChoice)}`;
+            document.getElementById('botChoice').innerText = `Bot chose: ${getEmoji(botChoice)}`;
 
             if (playerChoice === botChoice) {
-                resultMessage = "It's a tie!";
+                resultMessage = `It's a tie!`;
             } else if (
                 (playerChoice === 'rock' && botChoice === 'scissors') ||
                 (playerChoice === 'scissors' && botChoice === 'paper') ||
                 (playerChoice === 'paper' && botChoice === 'rock')
             ) {
                 playerWins++;
-                resultMessage = `${playerName} wins!`;
+                totalWins++;
+                totalStars += 5;
+                resultMessage = `You win! ${getEmoji(playerChoice)} beats ${getEmoji(botChoice)}`;
             } else {
                 botWins++;
-                resultMessage = `You lose!`;
+                totalLosses++;
+                resultMessage = `You lose! ${getEmoji(botChoice)} beats ${getEmoji(playerChoice)}`;
             }
 
-            document.getElementById('gameResult').innerText = resultMessage;
             document.getElementById('game').style.display = 'none';
             document.getElementById('result').style.display = 'block';
+            document.getElementById('resultMessage').innerText = resultMessage;
+            updateScores();
         }
 
         function nextRound() {
@@ -215,35 +206,23 @@
             if (round > 3) {
                 endGame();
             } else {
-                document.getElementById('score-board').style.display = 'none';
                 document.getElementById('result').style.display = 'none';
                 document.getElementById('game').style.display = 'block';
+                document.getElementById('playerChoice').innerText = '';
+                document.getElementById('botChoice').innerText = '';
             }
         }
 
         function endGame() {
             document.getElementById('result').style.display = 'none';
-            let stars = '';
-
-            if (playerWins > botWins) {
-                stars = '⭐️⭐️⭐️⭐️⭐️ You win 5 stars!';
-            } else {
-                stars = 'You lose! No stars this time.';
-            }
-
-            document.getElementById('stars').innerText = stars;
-            updateProfile();
+            document.getElementById('stars').innerText = `Stars: ${totalStars}`;
+            document.getElementById('profile').style.display = 'flex';
         }
 
-        function updateProfile() {
-            document.getElementById('profileName').innerText = `Name: ${playerName}`;
-            document.getElementById('profileWins').innerText = `Wins: ${playerWins}`;
-            document.getElementById('profileDefeats').innerText = `Defeats: ${botWins}`;
-        }
-
-        function toggleProfile() {
-            profileVisible = !profileVisible;
-            document.getElementById('profile').style.display = profileVisible ? 'block' : 'none';
+        function swipeBack() {
+            document.getElementById('profile').style.left = '100%';
+            document.getElementById('game-container').style.overflow = 'visible';
+            resetGame();
         }
 
         function getEmoji(choice) {
@@ -254,11 +233,28 @@
                     return '✋';
                 case 'scissors':
                     return '✌️';
-                default:
-                    return '';
             }
         }
-    </script>
 
+        function updateScores() {
+            document.getElementById('playerWins').innerText = playerWins;
+            document.getElementById('botWins').innerText = botWins;
+            document.getElementById('totalWins').innerText = totalWins;
+            document.getElementById('totalLosses').innerText = totalLosses;
+            document.getElementById('totalStars').innerText = totalStars;
+        }
+
+        function resetGame() {
+            round = 1;
+            playerWins = 0;
+            botWins = 0;
+            totalWins = 0;
+            totalLosses = 0;
+            totalStars = 0;
+            updateScores();
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
