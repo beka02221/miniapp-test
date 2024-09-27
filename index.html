@@ -3,163 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors 3D Game</title>
+    <title>Rock Paper Scissors Game</title>
     <style>
         body {
+            font-family: 'Press Start 2P', cursive;
+            background-image: url('https://images.unsplash.com/photo-1560641543-1c1e7f0b6b7d');
+            background-size: cover;
+            color: #fff;
+            text-align: center;
             margin: 0;
+            padding: 0;
             overflow: hidden;
-            background-color: #282c34;
-            color: white;
-            font-family: 'Arial', sans-serif;
         }
-        canvas {
-            display: block;
+        h1 {
+            margin-top: 20px;
+            text-shadow: 2px 2px 5px #000;
         }
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            font-size: 20px;
+        #game-container {
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            position: relative;
         }
-        .card {
-            width: 100px;
-            height: 150px;
-            display: inline-block;
-            margin: 10px;
+        #loading, #game, #result, #score, #nameInput {
+            display: none;
+        }
+        .btn {
+            padding: 15px 30px;
+            margin: 20px;
+            font-size: 18px;
             cursor: pointer;
-            font-size: 5em;
-            transition: transform 0.2s;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
         }
-        .card:hover {
-            transform: scale(1.1);
+        .btn:hover {
+            background-color: #e64a19;
+        }
+        .choice-btn {
+            padding: 15px;
+            font-size: 40px;
+            cursor: pointer;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+            transform: perspective(600px);
+        }
+        .choice-btn:hover {
+            background-color: #00695c;
+        }
+        .choices {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #yourChoice, #botChoice {
+            font-size: 50px;
+            margin: 10px;
+        }
+        footer {
+            margin-top: 50px;
+            color: #888;
+            text-shadow: 1px 1px 3px #000;
+        }
+
+        /* Анимации */
+        .win-animation {
+            animation: winScale 0.5s ease-in-out forwards;
+        }
+
+        .lose-animation {
+            animation: loseShake 0.5s ease-in-out forwards;
+        }
+
+        .star-animation {
+            opacity: 0;
+            animation: starAppear 1.5s ease-in-out forwards;
+        }
+
+        @keyframes winScale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes loseShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes starAppear {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1); }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="ui">
-        <input type="text" id="playerName" placeholder="Enter your name">
-        <button id="startBtn">Start Game</button>
-        <div id="choices" style="display: none;">
-            <div class="card" onclick="choose('rock')">✊</div>
-            <div class="card" onclick="choose('paper')">🖐️</div>
-            <div class="card" onclick="choose('scissors')">✌️</div>
+
+    <h1>Rock Paper Scissors Game</h1>
+
+    <div id="game-container">
+        <div id="nameInput">
+            <input type="text" id="playerName" placeholder="Enter your name" style="padding: 10px; width: 80%; border-radius: 10px; border: none;">
+            <button id="startBtn" class="btn">Start Game</button>
         </div>
-        <div id="result" style="display: none;"></div>
+
+        <div id="loading">
+            <p>Finding opponent...</p>
+            <p>Loading...</p>
+        </div>
+
+        <div id="game">
+            <p>Opponent found! Choose your move:</p>
+            <div class="choices">
+                <button class="choice-btn" onclick="playRound('rock')">✊</button>
+                <button class="choice-btn" onclick="playRound('paper')">🖐️</button>
+                <button class="choice-btn" onclick="playRound('scissors')">✌️</button>
+            </div>
+        </div>
+
+        <div id="result">
+            <div class="choices">
+                <div>
+                    <p>You chose:</p>
+                    <div id="yourChoice">❓</div>
+                </div>
+                <div>
+                    <p>Bot chose:</p>
+                    <div id="botChoice">❓</div>
+                </div>
+            </div>
+            <p id="resultMessage"></p>
+            <button class="btn" onclick="nextRound()">Next Round</button>
+        </div>
+
+        <div id="score-board">
+            <p>Round: <span id="round">1</span>/3</p>
+            <p>Player Wins: <span id="playerWins">0</span></p>
+            <p>Bot Wins: <span id="botWins">0</span></p>
+        </div>
+
+        <div id="stars"></div>
     </div>
-    
-    <script src="https://threejs.org/build/three.min.js"></script>
+
+    <footer>Created by Bekhruz</footer>
+
     <script>
-        let scene, camera, renderer;
-        let playerName = '';
-
-        // Инициализация сцены
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-            camera.position.z = 5;
-
-            window.addEventListener('resize', onWindowResize, false);
-            animate();
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        // Выбор игрока
-        function choose(playerChoice) {
-            const botChoice = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
-            const resultMessage = getResultMessage(playerChoice, botChoice);
-
-            // Создаем 3D карточки и анимацию
-            throwCard(playerChoice, 'player');
-            setTimeout(() => throwCard(botChoice, 'bot'), 1000);
-
-            document.getElementById('result').innerText = resultMessage;
-            document.getElementById('result').style.display = 'block';
-        }
-
-        // Логика результата
-        function getResultMessage(playerChoice, botChoice) {
-            if (playerChoice === botChoice) return `It's a tie! Both chose ${playerChoice}`;
-            if (
-                (playerChoice === 'rock' && botChoice === 'scissors') ||
-                (playerChoice === 'scissors' && botChoice === 'paper') ||
-                (playerChoice === 'paper' && botChoice === 'rock')
-            ) return `${playerName}, you win! ${playerChoice} beats ${botChoice}`;
-            return `You lose! ${botChoice} beats ${playerChoice}`;
-        }
-
-        // Анимация броска карточки
-        function throwCard(choice, type) {
-            const geometry = new THREE.PlaneGeometry(1, 1.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-            const card = new THREE.Mesh(geometry, material);
-
-            // Позиционирование карточки
-            card.position.set(type === 'player' ? -1 : 1, 0, 0);
-            scene.add(card);
-
-            // Установка текстуры карточки (эмодзи)
-            const texture = new THREE.CanvasTexture(drawEmoji(choice));
-            material.map = texture;
-            material.needsUpdate = true;
-
-            // Анимация
-            card.rotation.x = -Math.PI / 2; // Поворот карточки для эффекта
-            animateCard(card);
-        }
-
-        // Рисуем эмодзи на канвасе
-        function drawEmoji(choice) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 100;
-            canvas.height = 150;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffcc00';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.font = '100px Arial';
-            ctx.fillText(emojiMap[choice], 10, 110);
-            return canvas;
-        }
-
-        const emojiMap = {
+        const choices = ['rock', 'paper', 'scissors'];
+        const emojis = {
             'rock': '✊',
             'paper': '🖐️',
             'scissors': '✌️'
         };
+        let round = 1;
+        let playerWins = 0;
+        let botWins = 0;
+        let playerName = '';
 
-        // Основная анимация
-        function animateCard(card) {
-            const tween = new TWEEN.Tween(card.position)
-                .to({ y: -2 }, 1000)
-                .easing(TWEEN.Easing.Quadratic.Out)
-                .onComplete(() => scene.remove(card))
-                .start();
+        document.getElementById('startBtn').addEventListener('click', startGame);
+
+        function startGame() {
+            playerName = document.getElementById('playerName').value;
+            if (!playerName) {
+                alert("Please enter your name!");
+                return;
+            }
+            document.getElementById('nameInput').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('game').style.display = 'block';
+            }, 2000);
         }
 
-        // Основной цикл анимации
-        function animate() {
-            requestAnimationFrame(animate);
-            TWEEN.update();
-            renderer.render(scene, camera);
+        function playRound(playerChoice) {
+            const botChoice = choices[Math.floor(Math.random() * 3)];
+            let resultMessage = '';
+
+            // Показ выбранных вариантов игрока и бота
+            document.getElementById('yourChoice').innerText = emojis[playerChoice];
+            document.getElementById('botChoice').innerText = emojis[botChoice];
+
+            // Логика победы/проигрыша
+            if (playerChoice === botChoice) {
+                resultMessage = `It's a tie! You both chose ${emojis[playerChoice]}`;
+            } else if (
+                (playerChoice === 'rock' && botChoice === 'scissors') ||
+                (playerChoice === 'scissors' && botChoice === 'paper') ||
+                (playerChoice === 'paper' && botChoice === 'rock')
+            ) {
+                playerWins++;
+                document.getElementById('yourChoice').classList.add('win-animation');
+                resultMessage = `${playerName} wins! ${emojis[playerChoice]} beats ${emojis[botChoice]}`;
+            } else {
+                botWins++;
+                document.getElementById('botChoice').classList.add('win-animation');
+                resultMessage = `You lose! ${emojis[botChoice]} beats ${emojis[playerChoice]}`;
+            }
+
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('resultMessage').innerText = resultMessage;
         }
 
-        document.getElementById('startBtn').addEventListener('click', () => {
-            playerName = document.getElementById('playerName').value || 'Player';
-            document.getElementById('choices').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
-        });
+        function nextRound() {
+            round++;
+            if (round > 3) {
+                endGame();
+            } else {
+                document.getElementById('round').innerText = round;
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('game').style.display = 'block';
 
-        // Запускаем сцену
-        init();
+                // Убираем анимации после завершения раунда
+                document.getElementById('yourChoice').classList.remove('win-animation');
+                document.getElementById('botChoice').classList.remove('win-animation');
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-container').innerHTML = `
+                <h2>Game Over!</h2>
+                <p>${playerName}, your score:</p>
+                <p>Player Wins: ${playerWins}</p>
+                <p>Bot Wins: ${botWins}</p>
+                <button class="btn" onclick="resetGame()">Play Again</button>
+            `;
+            showStars();
+        }
+
+        function showStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < playerWins; i++) {
+                const star = document.createElement('span');
+                star.innerText = '⭐';
+                star.className = 'star-animation';
+                star.style.fontSize = '50px';
+                star.style.margin = '5px';
+                star.style.display = 'inline-block';
+                starsContainer.appendChild(star);
+
+                // Анимация появления звезд
+                setTimeout(() => {
+                    star.style.opacity = 1;
+                    star.style.transform = 'scale(1)';
+                }, i * 500);
+            }
+        }
+
+        function resetGame() {
+            round = 1;
+            playerWins = 0;
+            botWins = 0;
+            document.getElementById('game-container').innerHTML = `
+                <div id="nameInput">
+                    <input type="text" id="playerName" placeholder="Enter your name" style="padding: 10px; width: 80%; border-radius: 10px; border: none;">
+                    <button id="startBtn" class="btn">Start Game</button>
+                </div>
+                <div id="loading" style="display:none;">
+                    <p>Finding opponent...</p>
+                    <p>Loading...</p>
+                </div>
+                <div id="game" style="display:none;">
+                    <p>Opponent found! Choose your move:</p>
+                    <div class="choices">
+                        <button class="choice-btn" onclick="playRound('rock')">✊</button>
+                        <button class="choice-btn" onclick="playRound('paper')">🖐️</button>
+                        <button class="choice-btn" onclick="playRound('scissors')">✌️</button>
+                    </div>
+                </div>
+                <div id="result" style="display:none;">
+                    <div class="choices">
+                        <div>
+                            <p>You chose:</p>
+                            <div id="yourChoice">❓</div>
+                        </div>
+                        <div>
+                            <p>Bot chose:</p>
+                            <div id="botChoice">❓</div>
+                        </div>
+                    </div>
+                    <p id="resultMessage"></p>
+                    <button class="btn" onclick="nextRound()">Next Round</button>
+                </div>
+                <div id="score-board">
+                    <p>Round: <span id="round">1</span>/3</p>
+                    <p>Player Wins: <span id="playerWins">0</span></p>
+                    <p>Bot Wins: <span id="botWins">0</span></p>
+                </div>
+                <div id="stars"></div>
+            `;
+            document.getElementById('startBtn').addEventListener('click', startGame);
+        }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 </body>
 </html>
