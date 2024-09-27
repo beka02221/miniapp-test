@@ -33,6 +33,14 @@
         .button:hover {
             transform: scale(1.1);
         }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            height: 100%;
+            perspective: 1000px;
+        }
         .card {
             display: inline-block;
             margin: 20px;
@@ -43,11 +51,30 @@
             border-radius: 15px;
             background-color: #fff;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.5s;
+            position: relative;
+            transform-style: preserve-3d;
         }
         .card:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            transform: rotateY(180deg);
+        }
+        .card-content {
+            position: absolute;
+            backface-visibility: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .card-front {
+            background-color: #ffcc00;
+        }
+        .card-back {
+            background-color: #e63946;
+            transform: rotateY(180deg);
+            color: white;
         }
         #result {
             margin-top: 30px;
@@ -56,20 +83,6 @@
         }
         #searching {
             display: none;
-        }
-        #screen {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            height: 100%;
         }
     </style>
 </head>
@@ -90,9 +103,30 @@
 <div id="choose" style="display:none;">
     <h2>Выберите свой вариант</h2>
     <div class="container">
-        <div class="card" onclick="playerChoice('rock')">Камень<br>🪨</div>
-        <div class="card" onclick="playerChoice('scissors')">Ножницы<br>✂️</div>
-        <div class="card" onclick="playerChoice('paper')">Бумага<br>📄</div>
+        <div class="card" onclick="playerChoice('rock')">
+            <div class="card-content card-front">
+                Камень<br>🪨
+            </div>
+            <div class="card-content card-back">
+                Вы выбрали камень!
+            </div>
+        </div>
+        <div class="card" onclick="playerChoice('scissors')">
+            <div class="card-content card-front">
+                Ножницы<br>✂️
+            </div>
+            <div class="card-content card-back">
+                Вы выбрали ножницы!
+            </div>
+        </div>
+        <div class="card" onclick="playerChoice('paper')">
+            <div class="card-content card-front">
+                Бумага<br>📄
+            </div>
+            <div class="card-content card-back">
+                Вы выбрали бумагу!
+            </div>
+        </div>
     </div>
     <button class="button" onclick="backToMenu()">Главное меню</button>
 </div>
