@@ -6,125 +6,200 @@
     <title>Камень, Ножницы, Бумага</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0e68c; /* Цвет фона в стиле средневекового Японии */
-            color: #333;
-            text-align: center;
-        }
-        h1 {
-            font-size: 2.5em;
-            color: #b48c24; /* Цвет заголовка */
-        }
-        .choices {
-            display: none; /* Скрыть карточки изначально */
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
             justify-content: center;
-            margin: 20px 0;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
         }
         .choice {
-            margin: 0 15px;
-            padding: 20px;
-            border: 2px solid #b48c24;
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #007bff;
             border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: transform 0.2s;
         }
-        .choice:hover {
-            background-color: #e8d06d; /* Цвет при наведении */
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 1.5em;
-        }
-        .stars {
-            color: gold;
-            font-size: 1.5em;
-        }
-        .start {
-            margin: 20px;
-            padding: 10px 20px;
-            border: 1px solid #b48c24;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .start:hover {
-            background-color: #e8d06d; /* Цвет при наведении */
+        .card:hover {
+            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div id="main-menu">
+            <h1>Камень, Ножницы, Бумага</h1>
+            <button onclick="startGame()">Начать игру</button>
+            <button onclick="showRules()">Правила</button>
+            <button onclick="searchPlayer()">Поиск игрока</button>
+        </div>
 
-    <h1>Камень, Ножницы, Бумага</h1>
-    <button class="start" onclick="startGame()">Начать игру</button>
+        <div id="search-screen" class="hidden">
+            <h2>Поиск соперника</h2>
+            <input type="text" id="playerName" placeholder="Введите ваше имя">
+            <button onclick="findOpponent()">Искать</button>
+            <button onclick="backToMenu()">Назад</button>
+            <p id="searchMessage"></p>
+        </div>
 
-    <div class="choices" id="choices">
-        <div class="choice" onclick="userChoice('rock')">🪨 Камень</div>
-        <div class="choice" onclick="userChoice('scissors')">✂️ Ножницы</div>
-        <div class="choice" onclick="userChoice('paper')">📄 Бумага</div>
+        <div id="choice-screen" class="hidden">
+            <h2>Выберите ваш вариант</h2>
+            <div class="choice">
+                <div class="card" onclick="makeChoice('rock')">🪨</div>
+                <div class="card" onclick="makeChoice('scissors')">✂️</div>
+                <div class="card" onclick="makeChoice('paper')">📄</div>
+            </div>
+            <button onclick="backToSearch()">Назад</button>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <h2 id="resultMessage"></h2>
+            <p>Вы выбрали: <span id="playerChoice"></span></p>
+            <p>Соперник выбрал: <span id="opponentChoice"></span></p>
+            <button onclick="playAgain()">Играть снова</button>
+            <button onclick="backToMenu()">Главное меню</button>
+        </div>
+
+        <div id="rules-screen" class="hidden">
+            <h2>Правила игры</h2>
+            <p>Камень бьет ножницы, ножницы режут бумагу, бумага покрывает камень.</p>
+            <button onclick="backToMenu()">Назад</button>
+        </div>
     </div>
 
-    <div class="result" id="result"></div>
-    <div class="stars" id="stars"></div>
-
     <script>
-        let userWins = 0;
-        let rounds = 0;
+        let playerName;
+        let opponentName = "Бот";
+        let playerChoice;
+        let opponentChoice;
+        let isSearching = false;
 
         function startGame() {
-            userWins = 0;
-            rounds = 0;
-            document.getElementById('result').innerText = '';
-            document.getElementById('stars').innerText = '';
-            document.getElementById('choices').style.display = 'flex'; // Показываем карточки
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('search-screen').classList.remove('hidden');
         }
 
-        function userChoice(choice) {
-            if (rounds < 3) {
-                const botChoice = getBotChoice();
-                determineWinner(choice, botChoice);
-                rounds++;
+        function showRules() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('rules-screen').classList.remove('hidden');
+        }
+
+        function searchPlayer() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('search-screen').classList.remove('hidden');
+        }
+
+        function backToMenu() {
+            resetGame();
+            document.getElementById('main-menu').classList.remove('hidden');
+            hideAllScreens();
+        }
+
+        function hideAllScreens() {
+            document.getElementById('search-screen').classList.add('hidden');
+            document.getElementById('choice-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('rules-screen').classList.add('hidden');
+        }
+
+        function backToSearch() {
+            document.getElementById('choice-screen').classList.add('hidden');
+            document.getElementById('search-screen').classList.remove('hidden');
+        }
+
+        function findOpponent() {
+            playerName = document.getElementById('playerName').value;
+            if (playerName.trim() === "") {
+                alert("Введите ваше имя!");
+                return;
             }
+            isSearching = true;
+            document.getElementById('searchMessage').textContent = "Поиск соперника...";
+            setTimeout(() => {
+                isSearching = false;
+                document.getElementById('searchMessage').textContent = "";
+                startChoosing();
+            }, 2000);
         }
 
-        function getBotChoice() {
-            const choices = ['rock', 'scissors', 'paper'];
-            return choices[Math.floor(Math.random() * choices.length)];
+        function startChoosing() {
+            document.getElementById('search-screen').classList.add('hidden');
+            document.getElementById('choice-screen').classList.remove('hidden');
         }
 
-        function determineWinner(user, bot) {
-            let resultText = '';
-            if (user === bot) {
-                resultText = 'Ничья!';
+        function makeChoice(choice) {
+            playerChoice = choice;
+            opponentChoice = ['rock', 'scissors', 'paper'][Math.floor(Math.random() * 3)];
+            determineResult();
+        }
+
+        function determineResult() {
+            let resultMessage = "";
+            if (playerChoice === opponentChoice) {
+                resultMessage = "Ничья!";
             } else if (
-                (user === 'rock' && bot === 'scissors') ||
-                (user === 'scissors' && bot === 'paper') ||
-                (user === 'paper' && bot === 'rock')
+                (playerChoice === 'rock' && opponentChoice === 'scissors') ||
+                (playerChoice === 'scissors' && opponentChoice === 'paper') ||
+                (playerChoice === 'paper' && opponentChoice === 'rock')
             ) {
-                resultText = 'Вы выиграли этот раунд!';
-                userWins++;
+                resultMessage = "Вы выиграли!";
             } else {
-                resultText = 'Вы проиграли этот раунд!';
+                resultMessage = "Вы проиграли!";
             }
-
-            document.getElementById('result').innerText = `Вы выбрали: ${user}, Бот выбрал: ${bot}. ${resultText}`;
-
-            if (rounds === 3) {
-                displayFinalResult();
-            }
+            showResult(resultMessage);
         }
 
-        function displayFinalResult() {
-            let finalText = '';
-            if (userWins > 1) {
-                finalText = 'Вы выиграли игру! 🎉';
-                document.getElementById('stars').innerText = '⭐️⭐️⭐️⭐️⭐️';
-            } else {
-                finalText = 'Вы проиграли игру! 😢';
-                document.getElementById('stars').innerText = '';
-            }
-            document.getElementById('result').innerText += `\n${finalText}`;
+        function showResult(result) {
+            document.getElementById('resultMessage').textContent = result;
+            document.getElementById('playerChoice').textContent = playerChoice;
+            document.getElementById('opponentChoice').textContent = opponentChoice;
+            document.getElementById('choice-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+        }
+
+        function playAgain() {
+            hideAllScreens();
+            document.getElementById('search-screen').classList.remove('hidden');
+            document.getElementById('playerName').value = "";
+        }
+
+        function resetGame() {
+            playerChoice = null;
+            opponentChoice = null;
+            document.getElementById('searchMessage').textContent = "";
         }
     </script>
-
 </body>
 </html>
