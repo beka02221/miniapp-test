@@ -6,122 +6,135 @@
     <title>Камень, Ножницы, Бумага</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        #game {
-            display: none;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0e68c; /* Цвет фона в стиле средневекового Японии */
+            color: #333;
             text-align: center;
         }
+        h1 {
+            font-size: 2.5em;
+            color: #b48c24; /* Цвет заголовка */
+        }
+        .choices {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
         .choice {
-            font-size: 2rem;
-            margin: 20px;
-        }
-        #result {
-            font-size: 2rem;
-            margin: 20px;
-        }
-        #profile {
-            display: none;
-            background-color: #fff;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 100%;
-            transition: left 0.5s;
+            margin: 0 15px;
             padding: 20px;
+            border: 2px solid #b48c24;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        #profile.visible {
-            left: 0;
+        .choice:hover {
+            background-color: #e8d06d; /* Цвет при наведении */
         }
-        #stars {
-            font-size: 2rem;
+        .result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        .stars {
+            color: gold;
+            font-size: 1.5em;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .menu-item {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 1px solid #b48c24;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .menu-item:hover {
+            background-color: #e8d06d; /* Цвет при наведении */
         }
     </style>
 </head>
 <body>
-    <div id="menu">
-        <h1>Камень, Ножницы, Бумага</h1>
-        <button id="startBtn">Поиск соперника</button>
-    </div>
 
-    <div id="game">
-        <h1 id="result">Результат</h1>
-        <div class="choice" id="playerChoice"></div>
-        <div class="choice">VS</div>
-        <div class="choice" id="botChoice"></div>
-        <button id="playAgain">Играть еще раз</button>
+    <h1>Камень, Ножницы, Бумага</h1>
+    <div class="choices">
+        <div class="choice" onclick="userChoice('rock')">🪨 Камень</div>
+        <div class="choice" onclick="userChoice('scissors')">✂️ Ножницы</div>
+        <div class="choice" onclick="userChoice('paper')">📄 Бумага</div>
     </div>
+    
+    <button onclick="startGame()">Поиск соперника</button>
+    
+    <div class="result" id="result"></div>
+    <div class="stars" id="stars"></div>
 
-    <div id="profile">
-        <h2>Профиль</h2>
-        <div id="stars">Звезды: 0</div>
-        <button id="backBtn">Назад</button>
+    <div class="menu">
+        <div class="menu-item">Главное меню</div>
+        <div class="menu-item">Настройки</div>
+        <div class="menu-item">Помощь</div>
     </div>
 
     <script>
-        const choices = ['Камень', 'Ножницы', 'Бумага'];
-        let playerStars = 0;
+        let userWins = 0;
         let rounds = 0;
 
-        document.getElementById('startBtn').onclick = function() {
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('game').style.display = 'block';
-            playGame();
-        };
-
-        function playGame() {
+        function userChoice(choice) {
             if (rounds < 3) {
-                const playerChoice = prompt("Выберите: Камень, Ножницы или Бумага");
-                const botChoice = choices[Math.floor(Math.random() * 3)];
-                document.getElementById('playerChoice').textContent = `Вы: ${playerChoice}`;
-                document.getElementById('botChoice').textContent = `Бот: ${botChoice}`;
-
-                let result = '';
-                if (playerChoice === botChoice) {
-                    result = 'Ничья!';
-                } else if (
-                    (playerChoice === 'Камень' && botChoice === 'Ножницы') ||
-                    (playerChoice === 'Ножницы' && botChoice === 'Бумага') ||
-                    (playerChoice === 'Бумага' && botChoice === 'Камень')
-                ) {
-                    result = 'Вы выиграли!';
-                    playerStars += 5;
-                } else {
-                    result = 'Вы проиграли!';
-                }
-
+                const botChoice = getBotChoice();
+                determineWinner(choice, botChoice);
                 rounds++;
-                document.getElementById('result').textContent = result;
-                document.getElementById('stars').textContent = `Звезды: ${playerStars}`;
-            } else {
-                alert(`Игра окончена! Вы заработали ${playerStars} звезд!`);
             }
         }
 
-        document.getElementById('playAgain').onclick = function() {
-            playGame();
-        };
+        function getBotChoice() {
+            const choices = ['rock', 'scissors', 'paper'];
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
 
-        document.getElementById('backBtn').onclick = function() {
-            document.getElementById('profile').classList.remove('visible');
-            document.getElementById('menu').style.display = 'flex';
-        };
+        function determineWinner(user, bot) {
+            let resultText = '';
+            if (user === bot) {
+                resultText = 'Ничья!';
+            } else if (
+                (user === 'rock' && bot === 'scissors') ||
+                (user === 'scissors' && bot === 'paper') ||
+                (user === 'paper' && bot === 'rock')
+            ) {
+                resultText = 'Вы выиграли этот раунд!';
+                userWins++;
+            } else {
+                resultText = 'Вы проиграли этот раунд!';
+            }
 
-        document.body.addEventListener('swipeleft', function() {
-            document.getElementById('profile').classList.add('visible');
-        });
+            document.getElementById('result').innerText = `Вы выбрали: ${user}, Бот выбрал: ${bot}. ${resultText}`;
 
-        document.body.addEventListener('swiperight', function() {
-            document.getElementById('profile').classList.remove('visible');
-        });
+            if (rounds === 3) {
+                displayFinalResult();
+            }
+        }
+
+        function displayFinalResult() {
+            let finalText = '';
+            if (userWins > 1) {
+                finalText = 'Вы выиграли игру! 🎉';
+                document.getElementById('stars').innerText = '⭐️⭐️⭐️⭐️⭐️';
+            } else {
+                finalText = 'Вы проиграли игру! 😢';
+                document.getElementById('stars').innerText = '';
+            }
+            document.getElementById('result').innerText += `\n${finalText}`;
+        }
+
+        function startGame() {
+            userWins = 0;
+            rounds = 0;
+            document.getElementById('result').innerText = '';
+            document.getElementById('stars').innerText = '';
+        }
     </script>
+
 </body>
 </html>
+
