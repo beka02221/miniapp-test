@@ -6,200 +6,159 @@
     <title>Камень, Ножницы, Бумага</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
             text-align: center;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        button {
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+        .button {
+            padding: 15px 30px;
             margin: 10px;
-            padding: 10px 20px;
             border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
+            border-radius: 10px;
+            background-color: #ffcc00;
             cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .hidden {
-            display: none;
-        }
-        .choice {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
+        .button:hover {
+            transform: scale(1.1);
         }
         .card {
-            width: 100px;
-            height: 100px;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: inline-block;
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 15px;
+            background-color: #fff;
             cursor: pointer;
             transition: transform 0.2s;
         }
         .card:hover {
             transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #e63946;
+        }
+        #searching {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="main-menu">
-            <h1>Камень, Ножницы, Бумага</h1>
-            <button onclick="startGame()">Начать игру</button>
-            <button onclick="showRules()">Правила</button>
-            <button onclick="searchPlayer()">Поиск игрока</button>
-        </div>
 
-        <div id="search-screen" class="hidden">
-            <h2>Поиск соперника</h2>
-            <input type="text" id="playerName" placeholder="Введите ваше имя">
-            <button onclick="findOpponent()">Искать</button>
-            <button onclick="backToMenu()">Назад</button>
-            <p id="searchMessage"></p>
-        </div>
+<div id="menu">
+    <h1>Камень, Ножницы, Бумага ✂️📄🪨</h1>
+    <button class="button" onclick="startGame()">Начать игру</button>
+    <button class="button" onclick="showRules()">Правила</button>
+    <button class="button" onclick="showSearch()">Поиск игрока</button>
+</div>
 
-        <div id="choice-screen" class="hidden">
-            <h2>Выберите ваш вариант</h2>
-            <div class="choice">
-                <div class="card" onclick="makeChoice('rock')">🪨</div>
-                <div class="card" onclick="makeChoice('scissors')">✂️</div>
-                <div class="card" onclick="makeChoice('paper')">📄</div>
-            </div>
-            <button onclick="backToSearch()">Назад</button>
-        </div>
+<div id="rules" style="display:none;">
+    <h2>Правила игры</h2>
+    <p>Выберите один из вариантов: Камень (🪨), Ножницы (✂️), Бумага (📄). Камень побеждает ножницы, ножницы побеждают бумагу, а бумага побеждает камень.</p>
+    <button class="button" onclick="hideRules()">Назад</button>
+</div>
 
-        <div id="result-screen" class="hidden">
-            <h2 id="resultMessage"></h2>
-            <p>Вы выбрали: <span id="playerChoice"></span></p>
-            <p>Соперник выбрал: <span id="opponentChoice"></span></p>
-            <button onclick="playAgain()">Играть снова</button>
-            <button onclick="backToMenu()">Главное меню</button>
-        </div>
+<div id="search" style="display:none;">
+    <h2>Поиск соперника</h2>
+    <input type="text" id="playerName" placeholder="Введите имя игрока">
+    <button class="button" onclick="searchPlayer()">Искать</button>
+    <button class="button" onclick="backToMenu()">Назад</button>
+    <p id="searching">Поиск соперника...</p>
+</div>
 
-        <div id="rules-screen" class="hidden">
-            <h2>Правила игры</h2>
-            <p>Камень бьет ножницы, ножницы режут бумагу, бумага покрывает камень.</p>
-            <button onclick="backToMenu()">Назад</button>
-        </div>
-    </div>
+<div id="choose" style="display:none;">
+    <h2>Выберите свой вариант</h2>
+    <div class="card" onclick="playerChoice('rock')">Камень 🪨</div>
+    <div class="card" onclick="playerChoice('scissors')">Ножницы ✂️</div>
+    <div class="card" onclick="playerChoice('paper')">Бумага 📄</div>
+    <button class="button" onclick="backToSearch()">Назад</button>
+</div>
 
-    <script>
-        let playerName;
-        let opponentName = "Бот";
-        let playerChoice;
-        let opponentChoice;
-        let isSearching = false;
+<div id="result" style="display:none;">
+    <h2 id="resultMessage"></h2>
+    <button class="button" onclick="playAgain()">Играть снова</button>
+    <button class="button" onclick="backToMenu()">Главное меню</button>
+</div>
 
-        function startGame() {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('search-screen').classList.remove('hidden');
+<script>
+    function startGame() {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('search').style.display = 'block';
+    }
+
+    function showRules() {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('rules').style.display = 'block';
+    }
+
+    function hideRules() {
+        document.getElementById('rules').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+    }
+
+    function showSearch() {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('search').style.display = 'block';
+    }
+
+    function backToMenu() {
+        document.getElementById('choose').style.display = 'none';
+        document.getElementById('search').style.display = 'none';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+    }
+
+    function searchPlayer() {
+        document.getElementById('searching').style.display = 'block';
+        setTimeout(function() {
+            document.getElementById('searching').style.display = 'none';
+            document.getElementById('search').style.display = 'none';
+            document.getElementById('choose').style.display = 'block';
+        }, 2000);
+    }
+
+    function backToSearch() {
+        document.getElementById('choose').style.display = 'none';
+        document.getElementById('search').style.display = 'block';
+    }
+
+    function playerChoice(choice) {
+        const options = ['rock', 'scissors', 'paper'];
+        const player = choice;
+        const opponent = options[Math.floor(Math.random() * options.length)];
+
+        let resultMessage;
+        if (player === opponent) {
+            resultMessage = 'Ничья! 🤝';
+        } else if (
+            (player === 'rock' && opponent === 'scissors') ||
+            (player === 'scissors' && opponent === 'paper') ||
+            (player === 'paper' && opponent === 'rock')
+        ) {
+            resultMessage = 'Вы выиграли! 🎉';
+        } else {
+            resultMessage = 'Вы проиграли! 😢';
         }
 
-        function showRules() {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('rules-screen').classList.remove('hidden');
-        }
+        document.getElementById('resultMessage').innerText = `Ваш выбор: ${choice === 'rock' ? 'Камень 🪨' : choice === 'scissors' ? 'Ножницы ✂️' : 'Бумага 📄'}\nВыбор соперника: ${opponent === 'rock' ? 'Камень 🪨' : opponent === 'scissors' ? 'Ножницы ✂️' : 'Бумага 📄'}\n${resultMessage}`;
+        document.getElementById('choose').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+    }
 
-        function searchPlayer() {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('search-screen').classList.remove('hidden');
-        }
+    function playAgain() {
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('choose').style.display = 'block';
+    }
+</script>
 
-        function backToMenu() {
-            resetGame();
-            document.getElementById('main-menu').classList.remove('hidden');
-            hideAllScreens();
-        }
-
-        function hideAllScreens() {
-            document.getElementById('search-screen').classList.add('hidden');
-            document.getElementById('choice-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('rules-screen').classList.add('hidden');
-        }
-
-        function backToSearch() {
-            document.getElementById('choice-screen').classList.add('hidden');
-            document.getElementById('search-screen').classList.remove('hidden');
-        }
-
-        function findOpponent() {
-            playerName = document.getElementById('playerName').value;
-            if (playerName.trim() === "") {
-                alert("Введите ваше имя!");
-                return;
-            }
-            isSearching = true;
-            document.getElementById('searchMessage').textContent = "Поиск соперника...";
-            setTimeout(() => {
-                isSearching = false;
-                document.getElementById('searchMessage').textContent = "";
-                startChoosing();
-            }, 2000);
-        }
-
-        function startChoosing() {
-            document.getElementById('search-screen').classList.add('hidden');
-            document.getElementById('choice-screen').classList.remove('hidden');
-        }
-
-        function makeChoice(choice) {
-            playerChoice = choice;
-            opponentChoice = ['rock', 'scissors', 'paper'][Math.floor(Math.random() * 3)];
-            determineResult();
-        }
-
-        function determineResult() {
-            let resultMessage = "";
-            if (playerChoice === opponentChoice) {
-                resultMessage = "Ничья!";
-            } else if (
-                (playerChoice === 'rock' && opponentChoice === 'scissors') ||
-                (playerChoice === 'scissors' && opponentChoice === 'paper') ||
-                (playerChoice === 'paper' && opponentChoice === 'rock')
-            ) {
-                resultMessage = "Вы выиграли!";
-            } else {
-                resultMessage = "Вы проиграли!";
-            }
-            showResult(resultMessage);
-        }
-
-        function showResult(result) {
-            document.getElementById('resultMessage').textContent = result;
-            document.getElementById('playerChoice').textContent = playerChoice;
-            document.getElementById('opponentChoice').textContent = opponentChoice;
-            document.getElementById('choice-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-        }
-
-        function playAgain() {
-            hideAllScreens();
-            document.getElementById('search-screen').classList.remove('hidden');
-            document.getElementById('playerName').value = "";
-        }
-
-        function resetGame() {
-            playerChoice = null;
-            opponentChoice = null;
-            document.getElementById('searchMessage').textContent = "";
-        }
-    </script>
 </body>
 </html>
+
