@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cakes Order Page</title>
+    <style>
+        body {
+            background-color: #2f4f5f;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: auto;
+            box-sizing: border-box;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 4vw;
+            margin: 10px 0;
+        }
+
+        .category {
+            font-size: 4vw;
+            background-color: #003;
+            color: white;
+            padding: 8px 18px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 90%;
+            text-align: center;
+        }
+
+        .category:hover {
+            background-color: rgba(255, 166, 0, 0.1);
+        }
+
+        .item-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            width: 90%;
+        }
+
+        .item-container.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .item-container.hide {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .item {
+            background-color: #003;
+            border-radius: 15px;
+            padding: 18px;
+            text-align: center;
+            border: 2px solid #001;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            margin: 5px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+            position: relative; /* To position the counter badge */
+        }
+
+        .item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 166, 0, 0.8);
+}
+
+.hover-info {
+    position: absolute; /* Позиционирование текста */
+    bottom: 10px; /* Отступ от нижней части элемента */
+    left: 50%; /* Центрирование текста */
+    transform: translateX(-50%); /* Центрирование текста по горизонтали */
+    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+    color: #fff; /* Цвет текста */
+    padding: 5px 10px; /* Отступы для текста */
+    border-radius: 5px; /* Скругление углов */
+    opacity: 0; /* Скрыть текст по умолчанию */
+    transition: opacity 0.3s; /* Плавный переход */
+}
+
+.item:hover .hover-info {
+    opacity: 1; /* Показывать текст при наведении */
+}
+
+        .item img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 5px;
+        }
+
+        .item p {
+            color: white;
+            font-size: 3.5vw;
+            margin-top: 5px;
+        }
+
+        .add-btn {
+            background-color: orange;
+            width: 100%;
+            height: 10vw;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 15px;
+            font-size: 4vw;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-btn:hover {
+            background-color: #00dd29;
+        }
+
+        .info-btn {
+            background-color: rgb(0, 112, 34);
+            width: 50%;
+            height: 10vw;
+            color: rgb(255, 255, 255);
+            padding: 15px 0;
+            border: none;
+            border-radius: 15px;
+            font-size: 4vw;
+            cursor: pointer;
+        }
+
+        .order-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 350px;
+            margin-top: 20px;
+        }
+
+        .order-btn {
+            background-color: #003;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 5vw;
+            border: 2px solid orange;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .order-btn:hover {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .order-details {
+            margin-top: 10px;
+            font-size: 4.5vw;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal button {
+            background-color: #003;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .item-count {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background-color: #00dd29;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: none; /* Hidden initially */
+        }
+
+        /* Payment Modal Styles */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            animation: zoomIn 0.3s ease;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .payment-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .payment-methods {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.payment-btn {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.payment-btn.selected {
+    background-color: #0056b3; /* Темный цвет для выбранной кнопки */
+}
+
+.order-details {
+    margin: 20px 0;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.remove-btn {
+    background-color: #FF4136;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Минимальная высота тела страницы */
+    margin: 0; /* Убирает отступы по умолчанию */
+}
+
+footer {
+    margin-top: auto; /* Автоматически оставляет пространство сверху для растягивания */
+    padding: 10px; /* Отступы вокруг текста */
+    text-align: center; /* Центрирует текст */
+}
+footer a {
+    color: #00ccff; /* Цвет ссылки */
+    text-decoration: none; /* Убрать подчеркивание */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+}
+
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .category {
+                font-size: 2vw;
+            }
+
+            .add-btn, .info-btn, .order-btn {
+                font-size: 1.2rem;
+            }
+
+            .order-details {
+                font-size: 1.4rem;
+            }
+
+            .item {
+                width: 20vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Café Order Page</h1>
+
+    <div class="category" onclick="toggleCategory('cakes')">Cakes</div>
+    <div class="item-container" id="cakes">
+        <div class="item">
+            <span class="item-count" id="count-cake1">+0</span>
+            <img src="cake1.jpg" alt="Cake 1" onclick="showModal('cake1.jpg', 'all info.')">
+            <p>Delicious chocolate cake</p>
+            <button class="add-btn" data-price="3.56" data-name="Cake 1" data-id="count-cake1">ADD</button><br>
+            <button class="info-btn">3.56$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-cake2">+0</span>
+            <img src="cake2.jpg" alt="Cake 2" onclick="showModal('cake2.jpg', 'all info.')">
+            <p>Sweet vanilla cake</p>
+            <button class="add-btn" data-price="6.87" data-name="Cake 2" data-id="count-cake2">ADD</button><br>
+            <button class="info-btn">6.87$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-cake3">+0</span>
+            <img src="cake3.jpg" alt="Cake 3" onclick="showModal('cake3.jpg', 'all info.')">
+            <p>Refreshing fruit cake</p>
+            <button class="add-btn" data-price="9.99" data-name="Cake 3" data-id="count-cake3">ADD</button><br>
+            <button class="info-btn">9.99$</button>
+        </div>
+    </div>
+
+    <div class="category" onclick="toggleCategory('burgers')">Burgers</div>
+    <div class="item-container" id="burgers">
+        <div class="item">
+            <span class="item-count" id="count-burger1">+0</span>
+            <img src="burger1.jpg" alt="Burger 1" onclick="showModal('burger1.jpg', 'all info.')">
+            <p>Beef Burger</p>
+            <button class="add-btn" data-price="5.99" data-name="Burger 1" data-id="count-burger1">ADD</button><br>
+            <button class="info-btn">5.99$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-burger2">+0</span>
+            <img src="burger2.jpg" alt="Burger 2" onclick="showModal('burger2.jpg', 'This is Burger 2.')">
+            <p>Chicken Burger</p>
+            <button class="add-btn" data-price="6.49" data-name="Burger 2" data-id="count-burger2">ADD</button><br>
+            <button class="info-btn">6.49$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-burger3">+0</span>
+            <img src="burger3.jpg" alt="Burger 3" onclick="showModal('burger3.jpg', 'This is Burger 3.')">
+            <p>Veggie Burger</p>
+            <button class="add-btn" data-price="4.99" data-name="Burger 3" data-id="count-burger3">ADD</button><br>
+            <button class="info-btn">4.99$</button>
+        </div>
+    </div>
+
+    <div class="category" onclick="toggleCategory('drinks')">Drinks</div>
+    <div class="item-container" id="drinks">
+        <div class="item">
+            <span class="item-count" id="count-drink1">+0</span>
+            <img src="drink1.jpg" alt="Drink 1" onclick="showModal('drink1.jpg', 'This is Drink 1.')">
+            <p>Fresh Lemonade</p>
+            <button class="add-btn" data-price="2.50" data-name="Drink 1" data-id="count-drink1">ADD</button><br>
+            <button class="info-btn">2.50$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-drink2">+0</span>
+            <img src="drink2.jpg" alt="Drink 2" onclick="showModal('drink2.jpg', 'This is Drink 2.')">
+            <p>Ice Tea</p>
+            <button class="add-btn" data-price="3.00" data-name="Drink 2" data-id="count-drink2">ADD</button><br>
+            <button class="info-btn">3.00$</button>
+        </div>
+        <div class="item">
+            <span class="item-count" id="count-drink3">+0</span>
+            <img src="drink3.jpg" alt="Drink 3" onclick="showModal('drink3.jpg', 'This is Drink 3.')">
+            <p>Soda</p>
+            <button class="add-btn" data-price="1.50" data-name="Drink 3" data-id="count-drink3">ADD</button><br>
+            <button class="info-btn">1.50$</button>
+        </div>
+    </div>
+
+    <div class="order-container">
+        <h2>Your Order</h2>
+        <div class="order-details" id="orderDetails">No items added</div>
+        <button class="order-btn" id="orderBtn">Order</button>
+    </div>
+
+    <!-- Modal for Product Info -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span onclick="closeModal()" style="cursor:pointer;">&times;</span>
+            <img id="modalImg" src="" alt="Product Image" style="width:100%; height:auto;">
+            <p id="modalText"></p>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-content">
+            <h2>Complete Your Order</h2>
+            <p>Total: <span id="totalAmount"></span></p>
+            <input type="text" placeholder="Your Phone Number" id="phoneInput" required>
+            <input type="text" placeholder="Your Address" id="addressInput" required>
+            <div class="payment-methods">
+                <button class="payment-btn" id="cashBtn" onclick="selectPaymentMethod('cash')">Cash</button>
+                <button class="payment-btn" id="cardBtn" onclick="selectPaymentMethod('card')">Card</button>
+            </div>
+            
+            </label>
+            <button onclick="confirmOrder()">Confirm Order</button>
+            <button onclick="closePaymentModal()">Cancel</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <a href="https://t.me/idkwhyton" target="_blank">Telegram</a>
+            <p>Developed by Bekhruz Shodiv</p>
+        </div>
+    </footer>
+    
+    
+
+    <script>
+        const orderDetails = document.getElementById('orderDetails');
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        const modalText = document.getElementById('modalText');
+        const paymentModal = document.getElementById('paymentModal');
+        const totalAmount = document.getElementById('totalAmount');
+
+        let currentCategory = null; // Track the currently open category
+
+        function toggleCategory(category) {
+            const container = document.getElementById(category);
+            if (currentCategory && currentCategory !== category) {
+                // If another category is open, close it
+                const currentContainer = document.getElementById(currentCategory);
+                currentContainer.classList.remove('show'); // Remove show class to start hiding
+                currentContainer.classList.add('hide'); // Add hide class to trigger fade out
+
+                // Wait for the fade-out animation to finish
+                setTimeout(() => {
+                    currentContainer.style.display = 'none'; // Hide the container
+                }, 500); // Match this timeout with the CSS transition duration
+            }
+
+            if (container.style.display === 'none' || container.style.display === '') {
+                container.style.display = 'flex'; // Show the container
+                setTimeout(() => {
+                    container.classList.add('show'); // Add show class to trigger fade in
+                    container.classList.remove('hide'); // Ensure hide class is removed
+                }, 0); // Ensure this runs after the display change
+            } else {
+                container.classList.remove('show'); // Remove show class to start hiding
+                container.classList.add('hide'); // Add hide class to trigger fade out
+
+                // Wait for the fade-out animation to finish
+                setTimeout(() => {
+                    container.style.display = 'none'; // Hide the container
+                }, 500); // Match this timeout with the CSS transition duration
+            }
+
+            currentCategory = container.style.display === 'none' ? null : category; // Update current category
+        }
+
+        function showModal(image, text) {
+            modal.style.display = 'flex';
+            modalImg.src = image;
+            modalText.textContent = text;
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        const addButtons = document.querySelectorAll('.add-btn');
+        let order = [];
+        let itemCounts = {}; // Track the count of each item
+
+        addButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemName = button.getAttribute('data-name');
+                const itemPrice = parseFloat(button.getAttribute('data-price'));
+                const itemId = button.getAttribute('data-id'); // Get the ID of the counter span
+                if (!itemCounts[itemId]) itemCounts[itemId] = 0;
+                itemCounts[itemId]++; // Increase the count
+
+                // Update the count on the item
+                const countElement = document.getElementById(itemId);
+                countElement.textContent = `+${itemCounts[itemId]}`;
+                countElement.style.display = 'block'; // Show the count element
+
+                // Add to order array
+                order.push({ name: itemName, price: itemPrice });
+                updateOrderDetails();
+            });
+        });
+
+        function updateOrderDetails() {
+            if (order.length === 0) {
+                orderDetails.textContent = 'No items added';
+            } else {
+                const orderSummary = order.map(item => `${item.name} - $${item.price.toFixed(2)}`).join(', ');
+                const total = order.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+                orderDetails.textContent = `Order: ${orderSummary} | Total: $${total}`;
+            }
+        }
+
+        const orderBtn = document.getElementById('orderBtn');
+        orderBtn.addEventListener('click', function () {
+            if (order.length > 0) {
+                const total = order.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+                totalAmount.textContent = `$${total}`; // Set total amount in payment modal
+                paymentModal.style.display = 'flex'; // Show payment modal
+            } else {
+                alert('Please add items to your order before proceeding.');
+            }
+        });
+
+        let selectedPaymentMethod = 'cash'; // По умолчанию выбран метод "наличные"
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method; // Обновляем выбранный метод
+
+    // Сброс стилей для кнопок
+    document.getElementById('cashBtn').classList.remove('selected');
+    document.getElementById('cardBtn').classList.remove('selected');
+
+    // Добавляем выделение для выбранной кнопки
+    if (method === 'cash') {
+        document.getElementById('cashBtn').classList.add('selected');
+    } else {
+        document.getElementById('cardBtn').classList.add('selected');
+    }
+
+
+        
+            // You can now process the order data here
+            alert(`Order confirmed!\nTotal: ${totalAmount.textContent}\nPhone: ${phone}\nAddress: ${address}\nPayment: ${paymentMethod}`);
+            // Reset the order and close the modal
+            order = [];
+            orderDetails.textContent = 'No items added';
+            closePaymentModal();
+        }
+
+        function closePaymentModal() {
+            paymentModal.style.display = 'none';
+        }
+
+
+    </script>
+</body>
+</html>
